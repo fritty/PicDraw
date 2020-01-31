@@ -202,6 +202,6 @@ end
 
 local pic = image.load(args[1])
 
-flush(pic[1], pic[2])
+flush(160, 50)
 drawImage(1, 1, pic, 0)
 update(0)
