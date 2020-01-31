@@ -1,8 +1,7 @@
 local args = {...}
 local color = require("Color")
 local image = require("Image")
-local component = require("component")
-local gpu = component.gpu
+local gpu = require("component").gpu
 
 --------------------------------------------------------------------------------
 
