@@ -164,8 +164,6 @@ local function update(force)
 	changes = nil
 end
 
---------------------------------------------------------------------------------
-
 
 local function flush(width, height)
 	if not width or not height then
@@ -196,6 +194,37 @@ end
 
 local function clear(color, transparency)
 	drawRectangle(1, 1, bufferWidth, bufferHeight, color or 0x0, 0x000000, " ", transparency)
+end
+
+--------------------------------------------------------------------------------
+function load(path)
+	local file, reason = io.open(path, "r")
+	if file then
+		local readedSignature = file:read(#"OCIF")
+		if readedSignature == "OCIF" then
+			local encodingMethod = file:readBytes(1)
+			if encodingMethodsLoad[encodingMethod] then
+				local picture = {}
+				local result, reason = xpcall(encodingMethodsLoad[encodingMethod], debug.traceback, file, picture)
+				
+				file:close()
+
+				if result then
+					return picture
+				else
+					return false, "Failed to load OCIF image: " .. tostring(reason)
+				end
+			else
+				file:close()
+				return false, "Failed to load OCIF image: encoding method \"" .. tostring(encodingMethod) .. "\" is not supported"
+			end
+		else
+			file:close()
+			return false, "Failed to load OCIF image: binary signature \"" .. tostring(readedSignature) .. "\" is not valid"
+		end
+	else
+		return false, "Failed to open file \"" .. tostring(path) .. "\" for reading: " .. tostring(reason)
+	end
 end
 
 --------------------------------------------------------------------------------
