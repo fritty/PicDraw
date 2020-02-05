@@ -202,11 +202,18 @@ function load(path)
 	if file then
 		local readedSignature = file:read(#"OCIF")
 		if readedSignature == "OCIF" then
-			local encodingMethod = file:readBytes(1)
-			if encodingMethodsLoad[encodingMethod] then
+			local encodingMethod = string.byte(file:read(1))
+			if encodingMethod == 5  then
 				local picture = {}
-				local result, reason = xpcall(encodingMethodsLoad[encodingMethod], debug.traceback, file, picture)
-				
+				picture[1] = string.byte(file:read(2))file:readBytes(2)
+	                        picture[2] = file:readBytes(2)
+
+	                        for i = 1, image.getWidth(picture) * image.getHeight(picture) do
+		                  table.insert(picture, color.to24Bit(file:readBytes(1)))
+		                  table.insert(picture, color.to24Bit(file:readBytes(1)))
+		                  table.insert(picture, file:readBytes(1) / 255)
+		                  table.insert(picture, file:readUnicodeChar())
+	                end
 				file:close()
 
 				if result then
